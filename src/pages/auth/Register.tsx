@@ -5,6 +5,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAppDispatch } from "../../redux/hooks";
 import { registerThunkSpring } from "../../redux/thunks/auth.thunk";
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
+import toast from "react-hot-toast";
 
 function Register() {
     const dispatch = useAppDispatch();
@@ -37,7 +40,7 @@ function Register() {
             surnames: string;
             email: string;
             password: string;
-            imageUrl: string;
+            imageURL: string;
             description: string;
         }
         const registerData: RegisterData = {
@@ -45,12 +48,19 @@ function Register() {
             surnames: data.surNames,
             email: data.email,
             password: data.password,
-            imageUrl: "",
+            imageURL: "",
             description: "",
         };
         console.log(registerData);
         dispatch(registerThunkSpring(registerData));
     };
+    function googleRegisterSuccess(credentialResponse: CredentialResponse) {
+        const decoded: any = jwtDecode(credentialResponse.credential!);
+        dispatch(registerThunkSpring({ names: decoded.given_name, surnames: decoded.family_name, email: decoded.email, password: decoded.sub, imageURL: decoded.picture, description: "" }));
+    }
+    function googleRegisterError() {
+        toast.error("Ocurrio un error al intentar registrarse con Google");
+    }
     return (
         <div className="w-full h-screen flex items-center justify-center">
             <div className="shadow px-12 py-10 rounded text-center">
@@ -83,9 +93,18 @@ function Register() {
                         Sign up
                     </button>
                 </form>
+                <div className="flex  w-full justify-around items-center">
+                    <div className=" w-full border mx-2 my-4 h-0 relative"></div>
+                    <p>or</p>
+                    <div className="w-full border mx-2 my-4 h-0 relative"></div>
+                </div>
+                <div className="flex justify-center">
+                    <GoogleLogin width={300} onSuccess={googleRegisterSuccess} onError={googleRegisterError} />
+                </div>
+
                 <p className="mt-4 text-sm">
                     Already have an account?
-                    <Link to="/login" className="text-primary">
+                    <Link to="/login" className="ml-2 text-primary">
                         Log in
                     </Link>
                 </p>

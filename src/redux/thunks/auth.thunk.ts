@@ -22,13 +22,13 @@ export const loginThunkSpring = createAsyncThunk("auth/loginThunkSpring", async 
         };
     }
 });
-export const registerThunkSpring = createAsyncThunk("auth/registerThunkSpring", async ({ names, surnames, email, password, imageUrl, description }: { names: string; surnames: string; email: string; password: string; imageUrl: string; description: string }, { rejectWithValue }) => {
+export const registerThunkSpring = createAsyncThunk("auth/registerThunkSpring", async ({ names, surnames, email, password, imageURL, description }: { names: string; surnames: string; email: string; password: string; imageURL: string; description: string }, { rejectWithValue }) => {
     const authGenerate = await fetch(apiUrl + "/auth/register", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ names, password, email, surnames, imageUrl, description }),
+        body: JSON.stringify({ names, password, email, surnames, imageURL, description }),
     });
     if (!authGenerate.ok) {
         toast.error("Error al registrar usuario");
@@ -67,6 +67,7 @@ export const getUserDataThunk = createAsyncThunk(
             return rejectWithValue("Error al obtener datos de usuario");
         }
         const data = await response.json();
+        console.log(data);
         return {
             accessToken: token,
             userData: data,

@@ -10,12 +10,12 @@ import { getUserDataThunk } from "../../redux/thunks/auth.thunk";
 
 function UserLayout() {
     const [cookies, , removeCookie] = useCookies();
-    const { userData} = useAppSelector((state) => state.authReducer);
+    const { userData } = useAppSelector((state) => state.authReducer);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     useEffect(() => {
         if (userData === null) {
-            dispatch(getUserDataThunk({navigate, removeCookie}));
+            dispatch(getUserDataThunk({ navigate, removeCookie }));
         }
     }, [userData]);
 
@@ -24,7 +24,9 @@ function UserLayout() {
             <GeneralNav></GeneralNav>
             <Toaster />
             <DashBoard></DashBoard>
-            <Outlet></Outlet>
+            <div className="ml-16 p-4">
+                <Outlet></Outlet>
+            </div>
             <Footer></Footer>
         </>
     ) : (
