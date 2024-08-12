@@ -73,7 +73,7 @@ function Register() {
                             {errors.names && <span className="text-sm font-semibold text-danger">{errors.names.message}</span>}
                         </div>
                         <div>
-                            <InputLabel {...register("surNames")} type="text" placeholder="Last Name" label="Sur Names" />
+                            <InputLabel {...register("surNames")} type="text" placeholder="Last Name" label="Surnames" />
                             {errors.surNames && <span className="text-sm font-semibold text-danger">{errors.surNames.message?.toString()!}</span>}
                         </div>
                     </div>
