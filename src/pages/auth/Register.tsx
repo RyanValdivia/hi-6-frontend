@@ -1,6 +1,6 @@
 import { z } from "zod";
 import InputLabel from "../../components/ui/InputLabel";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAppDispatch } from "../../redux/hooks";
@@ -8,9 +8,12 @@ import { registerThunkSpring } from "../../redux/thunks/auth.thunk";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import toast from "react-hot-toast";
+import { useCookies } from "react-cookie";
 
 function Register() {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const [, setCookie] = useCookies();
     const registerSchema = z
         .object({
             names: z.string().min(3, { message: "El nombre debe tener al menos 3 caracteres." }),
@@ -52,11 +55,11 @@ function Register() {
             description: "",
         };
         console.log(registerData);
-        dispatch(registerThunkSpring(registerData));
+        dispatch(registerThunkSpring({... registerData, navigate, setCookie }));
     };
     function googleRegisterSuccess(credentialResponse: CredentialResponse) {
         const decoded: any = jwtDecode(credentialResponse.credential!);
-        dispatch(registerThunkSpring({ names: decoded.given_name, surnames: decoded.family_name, email: decoded.email, password: decoded.sub, imageURL: decoded.picture, description: "" }));
+        dispatch(registerThunkSpring({ names: decoded.given_name, surnames: decoded.family_name, email: decoded.email, password: decoded.sub, imageURL: decoded.picture, description: "" , navigate, setCookie }));
     }
     function googleRegisterError() {
         toast.error("Ocurrio un error al intentar registrarse con Google");
