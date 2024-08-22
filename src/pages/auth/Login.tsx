@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import InputLabel from "../../components/ui/InputLabel";
 import { z } from "zod";
 import { useAppDispatch } from "../../redux/hooks";
@@ -8,9 +8,12 @@ import { loginThunkSpring } from "../../redux/thunks/auth.thunk";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
 import { jwtDecode } from "jwt-decode";
+import { useCookies } from "react-cookie";
 
 function Login() {
+    const [, setCookie] = useCookies();
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const loginSchema = z.object({
         email: z.string().email({ message: "El correo electrónico no es válido." }),
         password: z.string().min(8, { message: "La contraseña debe tener al menos 6 caracteres." }),
@@ -24,12 +27,13 @@ function Login() {
         resolver: zodResolver(loginSchema),
     });
     const onSubmit = (data: FormData) => {
+        const dataWithCookieAndNavigate = { ...data, setCookie, navigate };
         console.log(data);
-        dispatch(loginThunkSpring(data));
+        dispatch(loginThunkSpring(dataWithCookieAndNavigate));
     };
     function googleLoginSuccess(credentialResponse: CredentialResponse) {
         const decoded: any = jwtDecode(credentialResponse.credential!);
-        dispatch(loginThunkSpring({ email: decoded.email, password: decoded.sub }));
+        dispatch(loginThunkSpring({ email: decoded.email, password: decoded.sub, setCookie, navigate }));
     }
     function googleLoginError() {
         toast.error("Ocurrio un error al intentar registrarse con Google");
